@@ -39,7 +39,8 @@ namespace WPF_Soundboard.Clips
                 soundInfo = value;
                 CallOnChanged();
                 playerHandler?.Stop();
-                playerHandler = GetClipPlayerHandler(soundInfo);
+                if (soundInfo.Enabled && File.Exists(soundInfo.Path))
+                    playerHandler = GetClipPlayerHandler(soundInfo);
             }
         }
         public HotkeyInfo HotkeyInfo { get => hotkeyInfo; set { hotkeyInfo = value; CallOnChanged(); InitializeHotkey(); } }
@@ -58,8 +59,6 @@ namespace WPF_Soundboard.Clips
 
             InitializeHotkey();
         }
-
-
 
         private void InitializeHotkey()
         {
