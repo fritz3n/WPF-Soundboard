@@ -1,0 +1,27 @@
+﻿<Window x:Class="WPF_Soundboard.Gui.ClipPageSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF_Soundboard.Gui" xmlns:controls="clr-namespace:WPF_Soundboard.Gui.Controls"
+        mc:Ignorable="d"
+        Title="ClipPageSettings" SizeToContent="Height" Width="257"
+        ResizeMode="NoResize">
+    <StackPanel Orientation="Vertical" Margin="10 10">
+        <Label Content="_Name" Target="{Binding ElementName=Name}"/>
+        <TextBox x:Name="Name" LostFocus="Name_LostFocus" KeyDown="Name_KeyDown"/>
+        <Label Content="Size"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="Width" Grid.Column="0" PreviewTextInput="NumberPreviewTextInput" LostFocus="Size_LostFocus" KeyDown="Size_KeyDown"/>
+            <Label Content="x" Padding="0" Margin="5 0" Grid.Column="1"/>
+            <TextBox x:Name="Height" Grid.Column="2" PreviewTextInput="NumberPreviewTextInput" LostFocus="Size_LostFocus" KeyDown="Size_KeyDown"/>
+        </Grid>
+        <Label Content="_Hotkey"/>
+        <controls:HotkeyButton x:Name="Hotkey" HotkeyChanged="Hotkey_HotkeyChanged"/>
+    </StackPanel>
+</Window>

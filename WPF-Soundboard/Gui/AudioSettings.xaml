@@ -1,0 +1,70 @@
+﻿<Window x:Class="WPF_Soundboard.Gui.AudioSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF_Soundboard.Gui"
+        mc:Ignorable="d"
+        Title="AudioSettings" Height="503" Width="321"
+        Closing="Window_Closing">
+    <Grid Margin="0,0,0,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Vertical">
+                <Label Content="_Volume" Target="{Binding ElementName=VolumenSlider}"/>
+                <Slider x:Name="VolumeSlider" ValueChanged="VolumenSlider_ValueChanged" LargeChange="0.1" Maximum="1" SmallChange="0.05" TickFrequency="0.05" TickPlacement="BottomRight"/>
+
+                <Label Content="Inputs"/>
+            </StackPanel>
+            <ListBox x:Name="InputListBox" Grid.Row="1"/>
+            <StackPanel Orientation="Vertical" Grid.Row="2">
+                <Label Content="_Output Type" Target="{Binding ElementName=OutputTypeBox}"/>
+                <ComboBox x:Name="OutputTypeBox" Margin="0,0,0,11" SelectionChanged="OutputTypeBox_SelectionChanged">
+                    <ComboBoxItem Content="Wasapi"/>
+                    <ComboBoxItem Content="ASIO"/>
+                </ComboBox>
+                <Grid>
+                    <Expander Header="Wasapi Settings" x:Name="WasapiSection" IsExpanded="True">
+                        <StackPanel Orientation="Vertical">
+                            <Label Content="Output" Target="{Binding ElementName=WasapiOut}"/>
+                            <ComboBox x:Name="WasapiOut" SelectionChanged="SelectionChanged" DisplayMemberPath="Value"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <Expander Header="Asio Settings" x:Name="AsioSection" IsExpanded="True">
+                        <StackPanel Orientation="Vertical">
+                            <Label Content="Output Driver" Target="{Binding ElementName=AsioDriver}"/>
+                            <ComboBox x:Name="AsioDriver" SelectionChanged="AsioDriver_SelectionChanged"/>
+                            <Label x:Name="AsioInfoLabel"/>
+
+                            <Label Content="Channel O_ffset" Target="{Binding ElementName=AsioStartChannel}"/>
+                            <TextBox x:Name="AsioStartChannel" PreviewTextInput="NumberPreviewTextInput" TextChanged="TextChanged" ToolTip="First Channel-Id to use"/>
+
+                            <Label Content="_Channels" Target="{Binding ElementName=AsioStartChannel}"/>
+                            <TextBox x:Name="AsioChannelCount" PreviewTextInput="NumberPreviewTextInput" TextChanged="TextChanged" ToolTip="How many Channels to use. Supported Values are 1 and 2. 2 Is Recommended."/>
+                        </StackPanel>
+                    </Expander>
+                </Grid>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" Margin="0,15,0,0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Button x:Name="OkButton" Content="Ok" Click="OkButton_Click" Margin="5, 0"/>
+            <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Margin="5, 0" Grid.Column="1"/>
+            <Button x:Name="ApplyButton" Content="Apply" Click="ApplyButton_Click" Margin="5, 0" Grid.Column="2" IsEnabled="False"/>
+        </Grid>
+    </Grid>
+</Window>

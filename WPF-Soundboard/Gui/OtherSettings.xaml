@@ -1,0 +1,14 @@
+﻿<Window x:Class="WPF_Soundboard.Gui.OtherSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF_Soundboard.Gui" xmlns:controls="clr-namespace:WPF_Soundboard.Gui.Controls"
+        mc:Ignorable="d"
+        Title="OtherSettings" Height="216" Width="338">
+    <StackPanel Orientation="Vertical" Margin="20">
+        <Label Content="Stop _Hotkey" Target="{Binding ElementName=HotkeyButton}"/>
+        <controls:HotkeyButton x:Name="HotkeyButton" HotkeyChanged="HotkeyButton_HotkeyChanged"/>
+        <CheckBox x:Name="AutostartBox" Content="Start at System start" Margin="10" Checked="AutostartBox_Checked" Unchecked="AutostartBox_Unchecked"/>
+    </StackPanel>
+</Window>
