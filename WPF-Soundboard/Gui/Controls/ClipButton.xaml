@@ -43,6 +43,11 @@
                             <Canvas Background="Indigo"/>
                         </MenuItem.Icon>
                     </MenuItem>
+                    <MenuItem Header="#DDDDDD" Click="ColorButton_Click">
+                        <MenuItem.Icon>
+                            <Canvas Background="#DDDDDD"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </MenuItem>
                 <MenuItem Header="Settings" Name="SettingsMenuItem" Click="SettingsMenuItem_Click"/>
             </ContextMenu>

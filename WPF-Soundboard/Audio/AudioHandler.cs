@@ -13,206 +13,206 @@ using WPF_Soundboard.Clips;
 
 namespace WPF_Soundboard.Audio
 {
-    static class AudioHandler
-    {
-        static List<ClipPlayer> clipPlayers = new List<ClipPlayer>();
-        static MixingSampleProvider audioMixer;
-        static MixingSampleProvider clipMixer;
-        static List<WasapiProvider> providers = new List<WasapiProvider>();
+	static class AudioHandler
+	{
+		static List<ClipPlayer> clipPlayers = new List<ClipPlayer>();
+		static MixingSampleProvider audioMixer;
+		static MixingSampleProvider clipMixer;
+		static List<WasapiProvider> providers = new List<WasapiProvider>();
 
-        private static VolumeSampleProvider OverallVolumeProvider;
-        private static VolumeSampleProvider ClipVolumeProvider;
+		private static VolumeSampleProvider OverallVolumeProvider;
+		private static VolumeSampleProvider ClipVolumeProvider;
 
-        static bool Initialized = false;
-        private static IOutput output;
-        private static AudioConfig config = Serializer.GetAudioConfig();
-        private static WaveFormat mixerFormat;
+		static bool Initialized = false;
+		private static IOutput output;
+		private static AudioConfig config = Serializer.GetAudioConfig();
+		private static WaveFormat mixerFormat;
 
-        public static AudioConfig Config { get => config; set { config = value; Serializer.SaveAudioConfig(value); Initialize(); } }
-        public static float ClipVolume { get => ClipVolumeProvider?.Volume ?? 1; set { if (ClipVolumeProvider != null) ClipVolumeProvider.Volume = value; } }
+		public static AudioConfig Config { get => config; set { config = value; Serializer.SaveAudioConfig(value); Initialize(); } }
+		public static float ClipVolume { get => ClipVolumeProvider?.Volume ?? 1; set { if (ClipVolumeProvider != null) ClipVolumeProvider.Volume = value; } }
 
-        public static void Initialize()
-        {
-            if (Initialized)
-                Dispose();
+		public static void Initialize()
+		{
+			if (Initialized)
+				Dispose();
 
-            if (config.OutType == AudioConfig.OutputType.WASAPI)
-                output = new WasapiOutput(config.OutputParameters);
-            else
-                output = new AsioOutput(config.OutputParameters);
+			if (config.OutType == AudioConfig.OutputType.WASAPI)
+				output = new WasapiOutput(config.OutputParameters);
+			else
+				output = new AsioOutput(config.OutputParameters);
 
-            mixerFormat = output.WaveFormat;
+			mixerFormat = output.WaveFormat;
 
-            bool differentMixerFormat = false;
+			bool differentMixerFormat = false;
 
-            if (mixerFormat.Encoding != WaveFormatEncoding.IeeeFloat)
-            {
-                differentMixerFormat = true;
-                mixerFormat = WaveFormat.CreateIeeeFloatWaveFormat(mixerFormat.SampleRate, mixerFormat.Channels);
-            }
-
-
-            clipMixer = new MixingSampleProvider(mixerFormat);
-            clipMixer.MixerInputEnded += ClipMixer_MixerInputEnded;
-            ClipVolumeProvider = new VolumeSampleProvider(clipMixer)
-            {
-                Volume = 1
-            };
+			if (mixerFormat.Encoding != WaveFormatEncoding.IeeeFloat)
+			{
+				differentMixerFormat = true;
+				mixerFormat = WaveFormat.CreateIeeeFloatWaveFormat(mixerFormat.SampleRate, mixerFormat.Channels);
+			}
 
 
-            audioMixer = new MixingSampleProvider(mixerFormat);
-            audioMixer.MixerInputEnded += AudioMixer_MixerInputEnded;
-            audioMixer.AddMixerInput(new SmoothCutoffSampleProvider(ClipVolumeProvider));
+			clipMixer = new MixingSampleProvider(mixerFormat);
+			clipMixer.MixerInputEnded += ClipMixer_MixerInputEnded;
+			ClipVolumeProvider = new VolumeSampleProvider(clipMixer)
+			{
+				Volume = 1
+			};
 
 
-            foreach (string id in config.WasapiIns)
-            {
-                try
-                {
-                    WasapiProvider input = new WasapiProvider(id);
-                    providers.Add(input);
-                    audioMixer.AddMixerInput(new ConvertingSampleProvider(input, mixerFormat));
-                }
-                catch (Exception) { }
-            }
+			audioMixer = new MixingSampleProvider(mixerFormat);
+			audioMixer.MixerInputEnded += AudioMixer_MixerInputEnded;
+			audioMixer.AddMixerInput(new SmoothCutoffSampleProvider(ClipVolumeProvider));
 
-            OverallVolumeProvider = new VolumeSampleProvider(audioMixer)
-            {
-                Volume = config.Volume
-            };
 
-            IWaveProvider mixerProvider;
-            if (differentMixerFormat)
-            {
-                mixerProvider = new PCMConversionWaveProvider(OverallVolumeProvider, output.WaveFormat.BitsPerSample / 8);
-            }
-            else
-            {
-                mixerProvider = OverallVolumeProvider.ToWaveProvider();
-            }
+			foreach (string id in config.WasapiIns)
+			{
+				try
+				{
+					WasapiProvider input = new WasapiProvider(id);
+					providers.Add(input);
+					audioMixer.AddMixerInput(new ConvertingSampleProvider(input, mixerFormat));
+				}
+				catch (Exception) { }
+			}
 
-            output.Init(mixerProvider);
+			OverallVolumeProvider = new VolumeSampleProvider(audioMixer)
+			{
+				Volume = config.Volume
+			};
 
-            foreach (WasapiProvider provider in providers)
-                provider.StartRecording();
+			IWaveProvider mixerProvider;
+			if (differentMixerFormat)
+			{
+				mixerProvider = new PCMConversionWaveProvider(OverallVolumeProvider, output.WaveFormat.BitsPerSample / 8);
+			}
+			else
+			{
+				mixerProvider = OverallVolumeProvider.ToWaveProvider();
+			}
 
-            output.Play();
-            Initialized = true;
-        }
+			output.Init(mixerProvider);
 
-        private static void ClipMixer_MixerInputEnded(object sender, SampleProviderEventArgs e)
-        {
-            ClipPlayer clipPlayer = (e.SampleProvider as ClipPlayer);
-            clipPlayer?.InvokeHasEnded();
-            clipPlayers.Remove(clipPlayer);
-        }
+			foreach (WasapiProvider provider in providers)
+				provider.StartRecording();
 
-        private static void AudioMixer_MixerInputEnded(object sender, SampleProviderEventArgs e) =>
-            //TODO Error Handling
-            throw new Exception();
+			output.Play();
+			Initialized = true;
+		}
 
-        public static void Play(ClipPlayer player)
-        {
-            if (!Initialized)
-                throw new InvalidOperationException("AudioHandler is not initialized!");
+		private static void ClipMixer_MixerInputEnded(object sender, SampleProviderEventArgs e)
+		{
+			ClipPlayer clipPlayer = (e.SampleProvider as ClipPlayer);
+			clipPlayer?.InvokeHasEnded();
+			clipPlayers.Remove(clipPlayer);
+		}
 
-            if (player.SoundInfo.SinglePlay)
-                StopAllSingleplay(player.SoundInfo);
+		private static void AudioMixer_MixerInputEnded(object sender, SampleProviderEventArgs e) =>
+			//TODO Error Handling
+			throw new Exception();
 
-            player.Init(mixerFormat);
+		public static void Play(ClipPlayer player)
+		{
+			if (!Initialized)
+				throw new InvalidOperationException("AudioHandler is not initialized!");
 
-            clipPlayers.Add(player);
-            clipMixer.AddMixerInput(player);
-        }
+			if (player.SoundInfo.SinglePlay)
+				StopAllSingleplay(player.SoundInfo);
 
-        public static void Stop(ClipPlayer player)
-        {
-            if (!Initialized)
-                throw new InvalidOperationException("AudioHandler is not initialized!");
+			player.Init(mixerFormat);
 
-            clipMixer.RemoveMixerInput(player);
-            clipPlayers.Remove(player);
-            player.InvokeHasEnded();
-        }
+			clipPlayers.Add(player);
+			clipMixer.AddMixerInput(player);
+		}
 
-        public static void StopAll()
-        {
-            if (!Initialized)
-                throw new InvalidOperationException("AudioHandler is not initialized!");
+		public static void Stop(ClipPlayer player)
+		{
+			if (!Initialized)
+				throw new InvalidOperationException("AudioHandler is not initialized!");
 
-            foreach (ClipPlayer player in clipPlayers)
-            {
-                clipMixer.RemoveMixerInput(player);
-                player.InvokeHasEnded();
-            }
-            clipPlayers.Clear();
-        }
+			clipMixer.RemoveMixerInput(player);
+			clipPlayers.Remove(player);
+			player.InvokeHasEnded();
+		}
 
-        static void StopAllSingleplay(SoundInfo requestor)
-        {
-            if (!Initialized)
-                throw new InvalidOperationException("AudioHandler is not initialized!");
+		public static void StopAll()
+		{
+			if (!Initialized)
+				throw new InvalidOperationException("AudioHandler is not initialized!");
 
-            List<ClipPlayer> remove = new List<ClipPlayer>();
+			foreach (ClipPlayer player in clipPlayers)
+			{
+				clipMixer.RemoveMixerInput(player);
+				player.InvokeHasEnded();
+			}
+			clipPlayers.Clear();
+		}
 
-            foreach (ClipPlayer player in clipPlayers)
-            {
-                if (player.SoundInfo != requestor && !player.SoundInfo.SinglePlayImmunity)
-                {
-                    clipMixer.RemoveMixerInput(player);
-                    remove.Add(player);
-                    player.InvokeHasEnded();
-                }
-            }
-            foreach (ClipPlayer player in remove)
-            {
-                clipPlayers.Remove(player);
-            }
-        }
+		static void StopAllSingleplay(SoundInfo requestor)
+		{
+			if (!Initialized)
+				throw new InvalidOperationException("AudioHandler is not initialized!");
 
-        public static void Dispose()
-        {
-            if (Initialized)
-                StopAll();
+			List<ClipPlayer> remove = new List<ClipPlayer>();
 
-            (output as IDisposable)?.Dispose();
-            foreach (WasapiProvider provider in providers)
-            {
-                provider?.StopRecording();
-                provider?.Dispose();
-            }
-            providers.Clear();
-            Initialized = false;
-        }
-    }
+			foreach (ClipPlayer player in clipPlayers)
+			{
+				if (player.SoundInfo != requestor && !player.SoundInfo.SinglePlayImmunity)
+				{
+					clipMixer.RemoveMixerInput(player);
+					remove.Add(player);
+					player.InvokeHasEnded();
+				}
+			}
+			foreach (ClipPlayer player in remove)
+			{
+				clipPlayers.Remove(player);
+			}
+		}
 
-    public class ConfigUnavailableException : Exception
-    {
-        public ConfigUnavailableException(string message) : base(message)
-        {
-        }
+		public static void Dispose()
+		{
+			if (Initialized)
+				StopAll();
 
-        public ConfigUnavailableException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
+			(output as IDisposable)?.Dispose();
+			foreach (WasapiProvider provider in providers)
+			{
+				provider?.StopRecording();
+				provider?.Dispose();
+			}
+			providers.Clear();
+			Initialized = false;
+		}
+	}
 
-        public ConfigUnavailableException()
-        {
-        }
-    }
+	public class ConfigUnavailableException : Exception
+	{
+		public ConfigUnavailableException(string message) : base(message)
+		{
+		}
 
-    public class InvalidOutputException : Exception
-    {
-        public InvalidOutputException(string message) : base(message)
-        {
-        }
+		public ConfigUnavailableException(string message, Exception innerException) : base(message, innerException)
+		{
+		}
 
-        public InvalidOutputException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
+		public ConfigUnavailableException()
+		{
+		}
+	}
 
-        public InvalidOutputException()
-        {
-        }
-    }
+	public class InvalidOutputException : Exception
+	{
+		public InvalidOutputException(string message) : base(message)
+		{
+		}
+
+		public InvalidOutputException(string message, Exception innerException) : base(message, innerException)
+		{
+		}
+
+		public InvalidOutputException()
+		{
+		}
+	}
 }

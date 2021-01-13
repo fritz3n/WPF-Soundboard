@@ -7,10 +7,10 @@ using System.Windows.Media;
 
 namespace WPF_Soundboard.Clips
 {
-    public struct GuiInfo
-    {
-        public string Name { get; set; }
+	public struct GuiInfo
+	{
+		public string Name { get; set; }
 
-        public Color Color { get; set; }
-    }
+		public Color Color { get; set; }
+	}
 }
