@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPF_Soundboard.Gui" xmlns:controls="clr-namespace:WPF_Soundboard.Gui.Controls"
         mc:Ignorable="d"
-        Title="OtherSettings" Height="216" Width="338">
+        Title="Other Settings" Height="216" Width="338">
     <StackPanel Orientation="Vertical" Margin="20">
         <Label Content="Stop _Hotkey" Target="{Binding ElementName=HotkeyButton}"/>
         <controls:HotkeyButton x:Name="HotkeyButton" HotkeyChanged="HotkeyButton_HotkeyChanged"/>

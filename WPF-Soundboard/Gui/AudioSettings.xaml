@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPF_Soundboard.Gui"
         mc:Ignorable="d"
-        Title="AudioSettings" Height="503" Width="321"
+        Title="Audio Settings" Height="503" Width="321"
         Closing="Window_Closing">
     <Grid Margin="0,0,0,10">
         <Grid.RowDefinitions>

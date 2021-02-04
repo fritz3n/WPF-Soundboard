@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:WPF_Soundboard"
         Closing="Window_Closing"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="Soundboard"
         Height="{Binding Source={x:Static p:Settings.Default}, Path=Height, Mode=TwoWay}"
         Width="{Binding Source={x:Static p:Settings.Default}, Path=Width, Mode=TwoWay}"
         Left="{Binding Source={x:Static p:Settings.Default}, Path=Left, Mode=TwoWay}"

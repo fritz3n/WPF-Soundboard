@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPF_Soundboard.Gui" xmlns:controls="clr-namespace:WPF_Soundboard.Gui.Controls"
         mc:Ignorable="d"
-        Title="ClipPageSettings" SizeToContent="Height" Width="257"
+        Title="Clip Page Settings" SizeToContent="Height" Width="257"
         ResizeMode="NoResize">
     <StackPanel Orientation="Vertical" Margin="10 10">
         <Label Content="_Name" Target="{Binding ElementName=Name}"/>

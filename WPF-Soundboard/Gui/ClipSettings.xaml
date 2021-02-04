@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WPF_Soundboard.Gui" xmlns:controls="clr-namespace:WPF_Soundboard.Gui.Controls"
         xmlns:cp="clr-namespace:DropDownCustomColorPicker;assembly=CustomColorPicker"
         mc:Ignorable="d"
-        Title="ClipSettings" Height="567" Width="430"
+        Title="Clip Settings" Height="567" Width="430"
         Closing="Window_Closing">
     <Grid Margin="20,20,20,10">
         <Grid.RowDefinitions>
