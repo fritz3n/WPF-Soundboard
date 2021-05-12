@@ -16,6 +16,7 @@ In the window that opens up, select any inputs you want be included in the outpu
 ![audio settings](Screenshots/setup2.png "audio settings")
 
 Finally, in the same window, choose your *tool input* as output.
+
 ![audio settings](Screenshots/setup3.png "audio settings")
 
 After hitting **save** you are good to go! Just select *tool output* as the input in your voice-communication programm and start using sounds!
