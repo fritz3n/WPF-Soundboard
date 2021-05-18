@@ -39,7 +39,7 @@ namespace WPF_Soundboard
             Hide();
 #endif
 
-			Assembly assembly = Assembly.GetExecutingAssembly();
+			var assembly = Assembly.GetExecutingAssembly();
 			string resourceName = "WPF_Soundboard.Resources.icon.ico";
 
 			using Stream stream = assembly.GetManifestResourceStream(resourceName);
@@ -48,23 +48,49 @@ namespace WPF_Soundboard
 			notifyIcon.MouseClick += NotifyIcon_MouseClick;
 
 			notifyIcon.ContextMenuStrip = new ContextMenuStrip();
-			ToolStripMenuItem showItem = new ToolStripMenuItem("Show");
+			var showItem = new ToolStripMenuItem("Show");
 			showItem.Click += ShowItem_Click;
-			ToolStripMenuItem exitItem = new ToolStripMenuItem("Exit");
+			var exitItem = new ToolStripMenuItem("Exit");
 			exitItem.Click += ExitItem_Click;
 			notifyIcon.ContextMenuStrip.Items.Add(showItem);
 			notifyIcon.ContextMenuStrip.Items.Add(exitItem);
 
 
 			InitializeComponent();
+
 			try
 			{
 				AudioHandler.Initialize();
 			}
 			catch
 			{
-				//TODO Error Handling
-				throw;
+				try
+				{
+					MessageBoxResult result = System.Windows.MessageBox.Show("Error while initializing Audio. Do you want to reset audio settings?",
+											  "Audio error in WPF-Soundboard",
+											  MessageBoxButton.YesNo,
+											  MessageBoxImage.Error);
+
+					if (result == MessageBoxResult.Yes)
+					{
+						AudioHandler.Config = AudioConfig.GetDefault();
+						AudioHandler.Initialize();
+					}
+					else
+					{
+						throw;
+					}
+				}
+				catch (Exception e)
+				{
+					System.Windows.MessageBox.Show(e.GetType() + ": " + e.Message + "\n--------\n" + e.StackTrace, "Audio error in WPF-Soundboard - Quitting", MessageBoxButton.OK, MessageBoxImage.Error);
+
+					closing = true;
+					notifyIcon.Visible = false;
+					AudioHandler.Dispose();
+					System.Windows.Application.Current.Shutdown();
+					return;
+				}
 			}
 
 			clipPages = Serializer.GetClipPages();
@@ -148,7 +174,7 @@ namespace WPF_Soundboard
 					for (int y = 0; y < currentPage.Height; y++)
 					{
 
-						ClipButton button = new ClipButton(x, y, currentPage[x, y], clipPages);
+						var button = new ClipButton(x, y, currentPage[x, y], clipPages);
 						if (currentPage[x, y] == null)
 							currentPage[x, y] = button.Clip;
 						button.OnDragDrop += Button_OnDragDrop;
@@ -174,7 +200,7 @@ namespace WPF_Soundboard
 
 		private void AddClipPage_Click(object sender, RoutedEventArgs e)
 		{
-			ClipPage page = new ClipPage(7, 5) { Name = "Page " + clipPages.Count };
+			var page = new ClipPage(7, 5) { Name = "Page " + clipPages.Count };
 			page.OnChanged += Page_OnChanged;
 
 			if (PagesList.SelectedIndex == -1)

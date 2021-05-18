@@ -69,7 +69,7 @@ namespace WPF_Soundboard.Audio
 			{
 				try
 				{
-					WasapiProvider input = new WasapiProvider(id);
+					var input = new WasapiProvider(id);
 					providers.Add(input);
 					audioMixer.AddMixerInput(new ConvertingSampleProvider(input, mixerFormat));
 				}
@@ -102,7 +102,7 @@ namespace WPF_Soundboard.Audio
 
 		private static void ClipMixer_MixerInputEnded(object sender, SampleProviderEventArgs e)
 		{
-			ClipPlayer clipPlayer = (e.SampleProvider as ClipPlayer);
+			var clipPlayer = (e.SampleProvider as ClipPlayer);
 			clipPlayer?.InvokeHasEnded();
 			clipPlayers.Remove(clipPlayer);
 		}
@@ -153,7 +153,7 @@ namespace WPF_Soundboard.Audio
 			if (!Initialized)
 				throw new InvalidOperationException("AudioHandler is not initialized!");
 
-			List<ClipPlayer> remove = new List<ClipPlayer>();
+			var remove = new List<ClipPlayer>();
 
 			foreach (ClipPlayer player in clipPlayers)
 			{
@@ -183,21 +183,6 @@ namespace WPF_Soundboard.Audio
 			}
 			providers.Clear();
 			Initialized = false;
-		}
-	}
-
-	public class ConfigUnavailableException : Exception
-	{
-		public ConfigUnavailableException(string message) : base(message)
-		{
-		}
-
-		public ConfigUnavailableException(string message, Exception innerException) : base(message, innerException)
-		{
-		}
-
-		public ConfigUnavailableException()
-		{
 		}
 	}
 
